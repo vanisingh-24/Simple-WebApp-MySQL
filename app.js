@@ -1,9 +1,12 @@
 var mysql = require('mysql');
 var faker = require('faker');
+var bodyParser = require('body-parser');
 var express = require('express');
 var app = express();
 
 app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static(__dirname + '/public'));
 
 var connection = mysql.createConnection({
     host: 'localhost',
@@ -19,6 +22,17 @@ app.get('/',function(req,res){
         if(err) throw err;
         var count = results[0].count;
         res.render('home', {count: count});
+    });
+});
+
+app.post('/register',function(req,res){
+    var person = {
+        email: req.body.email
+    };
+
+    connection.query('INSERT INTO users SET ?',person,function(err,result){
+        if(err) throw err;
+        res.redirect('/');
     });
 });
 
